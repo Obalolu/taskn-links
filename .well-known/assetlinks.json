@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.tasknest.app",
+      "sha256_cert_fingerprints": [
+        "A8:21:64:E9:B7:D0:61:AC:0A:CB:EF:30:CB:E3:6D:6E:41:16:07:51:B1:13:17:D9:0E:9D:8A:84:C6:93:10:85"
+      ]
+    }
+  }
+]
