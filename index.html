@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskApp - Opening...</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .store-links {
+            margin-top: 30px;
+        }
+        .store-btn {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TaskApp</h1>
+        <div class="loader"></div>
+        <p>Opening your shared content...</p>
+        <div class="store-links">
+            <p>Don't have the app?</p>
+            <a href="https://play.google.com/store" class="store-btn">Get on Android</a>
+            <a href="https://apps.apple.com" class="store-btn">Get on iOS</a>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type'); // 'timetable', 'event', 'project'
+        const id = urlParams.get('id');
+        
+        // Try to open the app with deep link
+        if (type && id) {
+            const deepLink = `taskapp://share/${type}?id=${id}`;
+            window.location.href = deepLink;
+        }
+        
+        // Fallback to app store after 2 seconds
+        setTimeout(() => {
+            // You'll update these with your actual app store links later
+            if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                window.location.href = 'https://apps.apple.com'; // Your iOS app link
+            } else {
+                window.location.href = 'https://play.google.com/store'; // Your Android app link
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
