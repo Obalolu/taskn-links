@@ -55,17 +55,26 @@
             background: #f8f9fa;
             border-radius: 8px;
         }
+        .debug-info {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>TaskNest</h1>
         <div class="loader"></div>
-        <p>Opening your shared content...</p>
+        <p id="statusMessage">Opening your shared content...</p>
         
         <div class="content-info" id="contentInfo" style="display: none;">
             <p><strong>Content Type:</strong> <span id="contentType"></span></p>
             <p><strong>ID:</strong> <span id="contentId"></span></p>
+            <div class="debug-info">
+                <p><strong>Current URL:</strong> <span id="currentUrl"></span></p>
+                <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+            </div>
         </div>
         
         <div class="store-links">
@@ -76,18 +85,24 @@
     </div>
 
     <script>
+        const statusMessage = document.getElementById('statusMessage');
+        const currentUrl = document.getElementById('currentUrl');
+        const userAgent = document.getElementById('userAgent');
+        
+        // Show debug info
+        currentUrl.textContent = window.location.href;
+        userAgent.textContent = navigator.userAgent;
+        
         // Parse the URL path: /taskn-links/timetable/123
         const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
         
-        // pathSegments[0] = 'taskn-links'
-        // pathSegments[1] = 'timetable' (or 'event', 'project')
-        // pathSegments[2] = '123' (the ID)
+        console.log('Path segments:', pathSegments);
         
         if (pathSegments.length >= 3 && pathSegments[0] === 'taskn-links') {
             const type = pathSegments[1];
             const id = pathSegments[2];
             
-            // Show content info for debugging
+            // Show content info
             document.getElementById('contentType').textContent = type;
             document.getElementById('contentId').textContent = id;
             document.getElementById('contentInfo').style.display = 'block';
@@ -104,16 +119,41 @@
             if (contentTypes[type]) {
                 document.title = `TaskNest - ${contentTypes[type]} Shared`;
             }
-        }
-        
-        // Fallback to app store after 3 seconds
-        setTimeout(() => {
-            if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-                window.location.href = 'https://apps.apple.com'; // Your iOS app link
+            
+            // Try to open the app immediately
+            const appUrl = window.location.href;
+            
+            // For Android, try the intent URL first
+            if (!/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                const intentUrl = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.tasknest.app;end`;
+                
+                statusMessage.textContent = 'Trying to open TaskNest app...';
+                
+                // Try intent URL
+                window.location.href = intentUrl;
+                
+                // Fallback after 2 seconds
+                setTimeout(() => {
+                    statusMessage.textContent = 'App not found. Redirecting to Play Store...';
+                    window.location.href = 'https://play.google.com/store/apps/details?id=com.tasknest.app';
+                }, 2000);
             } else {
-                window.location.href = 'https://play.google.com/store'; // Your Android app link
+                // For iOS
+                statusMessage.textContent = 'Trying to open TaskNest app...';
+                
+                // Try to open the app
+                window.location.href = appUrl;
+                
+                // Fallback after 2 seconds
+                setTimeout(() => {
+                    statusMessage.textContent = 'App not found. Redirecting to App Store...';
+                    window.location.href = 'https://apps.apple.com/app/tasknest/id123456789'; // Replace with your actual app ID
+                }, 2000);
             }
-        }, 3000);
+        } else {
+            statusMessage.textContent = 'Invalid link format';
+            document.getElementById('contentInfo').style.display = 'block';
+        }
     </script>
 </body>
 </html>
