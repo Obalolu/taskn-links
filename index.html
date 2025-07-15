@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskApp - Shared Content</title>
+    <title>TaskNest - Opening...</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -23,10 +23,23 @@
             text-align: center;
             max-width: 400px;
         }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
         .store-links {
             margin-top: 30px;
         }
-        .store-btn, .open-app-btn {
+        .store-btn {
             display: inline-block;
             background: #667eea;
             color: white;
@@ -35,19 +48,26 @@
             border-radius: 8px;
             margin: 5px;
             font-weight: 600;
-            border: none;
-            cursor: pointer;
         }
-        .open-app-btn {
-            background: #764ba2;
+        .content-info {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>TaskApp</h1>
-        <p>You've received shared content!</p>
-        <button class="open-app-btn" id="openAppBtn">Open in App</button>
+        <h1>TaskNest</h1>
+        <div class="loader"></div>
+        <p>Opening your shared content...</p>
+        
+        <div class="content-info" id="contentInfo" style="display: none;">
+            <p><strong>Content Type:</strong> <span id="contentType"></span></p>
+            <p><strong>ID:</strong> <span id="contentId"></span></p>
+        </div>
+        
         <div class="store-links">
             <p>Don't have the app?</p>
             <a href="https://play.google.com/store" class="store-btn">Get on Android</a>
@@ -56,13 +76,44 @@
     </div>
 
     <script>
-        // Get the current URL (which should be the deep link)
-        const currentUrl = window.location.href;
-
-        document.getElementById('openAppBtn').addEventListener('click', function() {
-            // Open the same https link, which will trigger the app if installed
-            window.location.href = currentUrl;
-        });
+        // Parse the URL path: /taskn-links/timetable/123
+        const pathSegments = window.location.pathname.split('/').filter(segment => segment !== '');
+        
+        // pathSegments[0] = 'taskn-links'
+        // pathSegments[1] = 'timetable' (or 'event', 'project')
+        // pathSegments[2] = '123' (the ID)
+        
+        if (pathSegments.length >= 3 && pathSegments[0] === 'taskn-links') {
+            const type = pathSegments[1];
+            const id = pathSegments[2];
+            
+            // Show content info for debugging
+            document.getElementById('contentType').textContent = type;
+            document.getElementById('contentId').textContent = id;
+            document.getElementById('contentInfo').style.display = 'block';
+            
+            console.log(`Opening ${type} with ID: ${id}`);
+            
+            // Update the page title based on content type
+            const contentTypes = {
+                'timetable': 'Timetable',
+                'event': 'Event',
+                'project': 'Project'
+            };
+            
+            if (contentTypes[type]) {
+                document.title = `TaskNest - ${contentTypes[type]} Shared`;
+            }
+        }
+        
+        // Fallback to app store after 3 seconds
+        setTimeout(() => {
+            if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+                window.location.href = 'https://apps.apple.com'; // Your iOS app link
+            } else {
+                window.location.href = 'https://play.google.com/store'; // Your Android app link
+            }
+        }, 3000);
     </script>
 </body>
 </html>
